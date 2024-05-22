@@ -118,6 +118,7 @@ const AppReact = () => {
                 rowNode = params.api.getRowNode(firstIntake.contractId);
 
                 const randomNumber = Math.random();
+                
                 if (randomNumber < conversionProbability) {
                     // 20% chance
                     
