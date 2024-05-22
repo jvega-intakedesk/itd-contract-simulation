@@ -28,7 +28,7 @@ ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 import ProgressBar from './components/ProgressBar';
 
-let numberOfDays = 0;
+let numberOfDays = 1;
 let assignedIntakes = [];
 
 const formatNumber = (number) => {
