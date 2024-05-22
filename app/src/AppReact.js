@@ -50,11 +50,28 @@ const AppReact = () => {
     const [progress, setProgress] = useState(100);
     const containerStyle = useMemo(() => ({ width: "98%", height: "500px" }), []);
     const gridStyle = useMemo(() => ({ height: "100%", width: "100%" }), []);
+    const [contractId, setContractId] = useState('');
+    const [priority, setPriority] = useState('');
+    const [updateMessage, setUpdateMessage] = useState('');
+    const gridApi = useRef(null);
 
     const randNumGenerator = () => (Math.floor(Math.random() * 5) + 1) * 10000;
 
+
+    const handleUpdatePriority = async () => {
+        if (!gridApi.current) return;
+
+        // Here you would send the data to your backend API to update the priority
+        // For demonstration, let's assume the API call is successful and update the message
+        setUpdateMessage(`Priority for contract ${contractId} has been updated to ${priority}.`);
+        var rowNode = gridApi.current.api.getRowNode(contractId-1);
+        console.log(rowNode);
+        rowNode.setDataValue('priority', parseFloat(priority));
+        console.log(rowNode);
+      };
+
     const onGridReady = useCallback((params) => {
-        
+        gridApi.current = params;
         const updateDaysLeftValues = () => {
             params.api.forEachNode((rowNode, index) => {
                 rowNode.setDataValue('daysLeft', rowNode.data.daysLeft - 1);
@@ -75,7 +92,7 @@ const AppReact = () => {
                 assignedIntakes.push({
                     contractId : rowNode.data.id,
                     dayAdded: numberOfDays,
-                    timestamp: new Date().toISOString()
+                    timestamp: Date.now()
                 });
 
                 rowNode.setDataValue('assignedIntakes', rowNode.data.assignedIntakes + 1);
@@ -95,7 +112,7 @@ const AppReact = () => {
 
                 // Step 2: Get the first intake from the top
                 let firstIntake = assignedIntakes[0];
-                console.log('firstIntake', firstIntake);
+                //console.log('firstIntake', firstIntake);
 
                 // Step 3: Calculate the number of days since the intake was added
                 let daysSinceAdded = numberOfDays - firstIntake.dayAdded;
@@ -119,7 +136,7 @@ const AppReact = () => {
                 //var rowNode = params.api.getDisplayedRowAtIndex(row);
                 var rowNode = params.api.getRowNode(firstIntake.contractId-1);
 
-                console.log('rowNode', rowNode);
+                //console.log('rowNode', rowNode);
 
                 const randomNumber = Math.random();
                 
@@ -196,7 +213,23 @@ const AppReact = () => {
             });
 
             params.api.forEachNode((rowNode, index) => {
-                const dist = parseFloat(((sum_intake_req < 1) ? 0 : ((1 / rowNode.data.convShortfall) / ((1 + rowNode.data.intakeDistribution) * (rowNode.data.casesToFulfill / ((rowNode.data.callables < 1) ? 1 : rowNode.data.callables) / 100))) * 100).toFixed(2)); //intakes required
+                const sumIntakeReq = sum_intake_req; // assuming sum_intake_req is defined somewhere
+
+                const intakeDistribution = rowNode.data.intakeDistribution;
+                const convShortfall = rowNode.data.convShortfall;
+                const casesToFulfill = rowNode.data.casesToFulfill;
+                const callables = rowNode.data.callables;
+
+                const adjustedCallables = (callables < 1) ? 1 : callables;
+                const intakeRatio = (casesToFulfill / adjustedCallables) / 100;
+                const distributionFactor = (1 + intakeDistribution) * intakeRatio;
+
+                let dist = parseFloat(
+                    ((sumIntakeReq < 1) ? 0 : ((1 / convShortfall) / distributionFactor) * 100).toFixed(2)
+                  );
+                
+                dist = dist - parseFloat(dist * rowNode.data.priority);
+
                 rowNode.setDataValue('distributionDeficit', dist);
             });
 
@@ -226,6 +259,7 @@ const AppReact = () => {
     const columnDefs = useMemo(() => [
         { field: 'id', headerName: 'ID', maxWidth: 50, resizable: true },
         { field: 'distributionDeficit', headerName: 'Deficit', maxWidth: 140, resizable: true, enableCellChangeFlash: true },
+        { field: 'priority', headerName: 'Priority', maxWidth: 140, resizable: true, enableCellChangeFlash: true },
         { field: 'contractDays', headerName: 'Contract Days', maxWidth: 130, resizable: true, cellRenderer: "agAnimateShowChangeCellRenderer" },
         { field: 'contractMin', headerName: 'Contract Min', minWidth: 110, resizable: true, cellRenderer: "agAnimateShowChangeCellRenderer" },
         { field: 'daysLeft', headerName: 'Days Left', maxWidth: 110, resizable: true, cellRenderer: "agAnimateShowChangeCellRenderer" },
@@ -254,12 +288,12 @@ const AppReact = () => {
     useEffect(() => {
         // Initialize contracts
         setContracts([
-            { id: 1, distributionDeficit: 0, contractDays: 90, contractMin: 300, daysLeft: 89, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 },
-            { id: 2, distributionDeficit: 0, contractDays: 60, contractMin: 200, daysLeft: 59, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 },
-            { id: 3, distributionDeficit: 0, contractDays: 90, contractMin: 300, daysLeft: 89, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 },
-            { id: 4, distributionDeficit: 0, contractDays: 30, contractMin: 100, daysLeft: 29, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 },
-            { id: 5, distributionDeficit: 0, contractDays: 45, contractMin: 150, daysLeft: 44, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 },
-            { id: 6, distributionDeficit: 0, contractDays: 70, contractMin: 250, daysLeft: 69, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 },
+            { id: 1, distributionDeficit: 0, priority: 0, contractDays: 90, contractMin: 300, daysLeft: 89, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 },
+            { id: 2, distributionDeficit: 0, priority: 0, contractDays: 60, contractMin: 200, daysLeft: 59, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 },
+            { id: 3, distributionDeficit: 0, priority: 0, contractDays: 90, contractMin: 300, daysLeft: 89, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 },
+            { id: 4, distributionDeficit: 0, priority: 0, contractDays: 30, contractMin: 100, daysLeft: 29, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 },
+            { id: 5, distributionDeficit: 0, priority: 0, contractDays: 45, contractMin: 150, daysLeft: 44, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 },
+            { id: 6, distributionDeficit: 0, priority: 0, contractDays: 70, contractMin: 250, daysLeft: 69, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 },
             // Add more contracts as needed
         ]);
 
@@ -284,7 +318,7 @@ const AppReact = () => {
     const addSmallContract = useCallback(() => {
         console.log("New Contract Button");
         const newContract = contracts.slice();
-        const newItem = { id: 0, distributionDeficit: 0, contractDays: 40, contractMin: 120, daysLeft: 0, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 };
+        const newItem = { id: 0, distributionDeficit: 0, priority: 0, contractDays: 40, contractMin: 120, daysLeft: 0, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 };
 
         newItem.id = contracts.length + 1;
         newItem.daysLeft = newItem.contractDays - 1;
@@ -297,7 +331,7 @@ const AppReact = () => {
     const addBigContract = useCallback(() => {
         console.log("New Contract Button");
         const newContract = contracts.slice();
-        const newItem = { id: 0, distributionDeficit: 0, contractDays: 86, contractMin: 260, daysLeft: 0, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 };
+        const newItem = { id: 0, distributionDeficit: 0, priority: 0, contractDays: 86, contractMin: 260, daysLeft: 0, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 };
 
         newItem.id = contracts.length + 1;
         newItem.daysLeft = newItem.contractDays - 1;
@@ -347,6 +381,34 @@ const AppReact = () => {
                     />
                 </div>
             </div>
+
+            <h1>Update Priority</h1>
+            <form onSubmit={(e) => e.preventDefault()}>
+                <div>
+                <label>
+                    Contract ID:
+                    <input
+                    type="text"
+                    value={contractId}
+                    onChange={(e) => setContractId(e.target.value)}
+                    />
+                </label>
+                </div>
+                <div>
+                <label>
+                    Priority:
+                    <input
+                    type="number"
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value)}
+                    />
+                </label>
+                </div>
+                <button type="button" onClick={handleUpdatePriority}>
+                Update Priority
+                </button>
+            </form>
+            {updateMessage && <p>{updateMessage}</p>}
 
         </div>
     );
