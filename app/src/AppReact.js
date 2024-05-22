@@ -74,7 +74,8 @@ const AppReact = () => {
                 
                 assignedIntakes.push({
                     contractId : rowNode.data.id,
-                    dayAdded: numberOfDays
+                    dayAdded: numberOfDays,
+                    timestamp: new Date().toISOString()
                 });
 
                 rowNode.setDataValue('assignedIntakes', rowNode.data.assignedIntakes + 1);
@@ -90,7 +91,7 @@ const AppReact = () => {
 
 
                 // Step 1: Sort the assignedIntakes array by dayAdded DESC
-                assignedIntakes.sort((a, b) => b.dayAdded - a.dayAdded);
+                assignedIntakes.sort((a, b) => b.timestamp - a.timestamp);
 
                 // Step 2: Get the first intake from the top
                 let firstIntake = assignedIntakes[0];
@@ -110,13 +111,13 @@ const AppReact = () => {
                     conversionProbability = .05;
                 }
 
-                var rowCount = params.api.getDisplayedRowCount();
+                //var rowCount = params.api.getDisplayedRowCount();
                 
                 //select the contract to apply logic
-                var row = Math.floor(Math.random() * rowCount);
+                //var row = Math.floor(Math.random() * rowCount);
 
-                var rowNode = params.api.getDisplayedRowAtIndex(row);
-                rowNode = params.api.getRowNode(firstIntake.contractId-1);
+                //var rowNode = params.api.getDisplayedRowAtIndex(row);
+                var rowNode = params.api.getRowNode(firstIntake.contractId-1);
 
                 console.log('rowNode', rowNode);
 
