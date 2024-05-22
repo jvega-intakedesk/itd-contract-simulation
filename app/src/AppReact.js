@@ -123,22 +123,22 @@ const AppReact = () => {
                 const randomNumber = Math.random();
                 
                 if (randomNumber < conversionProbability) {
-                    // 20% chance
+                    // chance of conversion
                     
                     if (rowNode.data.callables > 0) {
                         rowNode.setDataValue('convertedCases', rowNode.data.convertedCases + 1);
                     }
                     
-                    console.log("Update Conversion --->" + row);
+                    //console.log("Update Conversion --->" + row);
 
                 } else {
-                    // 80% chance
+                    // chance of dnq
                     
                     if (rowNode.data.callables > 0) {
                         rowNode.setDataValue('doNotQualify', rowNode.data.doNotQualify + 1);
                     }
                     
-                    console.log("Update Do Not QUality --->" + row);
+                    //console.log("Update Do Not QUality --->" + row);
                 }
 
                 
@@ -187,7 +187,7 @@ const AppReact = () => {
                 // console.log("Int Req -> " + rowNode.data.intakeReq); 
                 sum_intake_req = sum_intake_req + parseFloat(rowNode.data.intakeReq);
             });
-            console.log("sum_intake_req -------> " + sum_intake_req);
+            //console.log("sum_intake_req -------> " + sum_intake_req);
 
             params.api.forEachNode((rowNode, index) => {
                 const idd = parseFloat(((sum_intake_req < 1) ? rowNode.data.intakeReq : (rowNode.data.intakeReq / sum_intake_req) * 100).toFixed(2)); //intakes required
