@@ -116,7 +116,7 @@ const AppReact = () => {
                 var row = Math.floor(Math.random() * rowCount);
 
                 var rowNode = params.api.getDisplayedRowAtIndex(row);
-                rowNode = params.api.getRowNode(firstIntake.contractId);
+                rowNode = params.api.getRowNode(firstIntake.contractId-1);
 
                 console.log('rowNode', rowNode);
 
