@@ -94,6 +94,7 @@ const AppReact = () => {
 
                 // Step 2: Get the first intake from the top
                 let firstIntake = assignedIntakes[0];
+                console.log('firstIntake', firstIntake);
 
                 // Step 3: Calculate the number of days since the intake was added
                 let daysSinceAdded = numberOfDays - firstIntake.dayAdded;
@@ -117,6 +118,8 @@ const AppReact = () => {
                 var rowNode = params.api.getDisplayedRowAtIndex(row);
                 rowNode = params.api.getRowNode(firstIntake.contractId);
 
+                console.log('rowNode', rowNode);
+
                 const randomNumber = Math.random();
                 
                 if (randomNumber < conversionProbability) {
@@ -139,11 +142,12 @@ const AppReact = () => {
                 }
 
                 
-                
+                assignedIntakes.shift();
 
                 updateConvertedCasesValues();
 
                 recalculateValues();
+                
 
             }, 2500);
         };

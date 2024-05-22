@@ -1,6 +1,6 @@
 {
   "homepage": "https://jvega-intakedesk.github.io/itd-contract-simulation",
-  "name": "model-test",
+  "name": "itd-contract-simulation",
   "version": "0.1.0",
   "private": true,
   "scripts": {
