@@ -181,7 +181,7 @@ const AppReact = () => {
                 const acd = parseFloat((((rowNode.data.contractDays - rowNode.data.daysLeft) < 1) ? 1 : rowNode.data.convertedCases / (rowNode.data.contractDays - rowNode.data.daysLeft)).toFixed(2)); //actual case/day
                 rowNode.setDataValue('actualCasesPerDay', acd);
 
-                const rcd = (rowNode.data.daysLeft < 1) ? 1 : (rowNode.data.casesToFulfill / rowNode.data.daysLeft); //required case/day
+                const rcd = (rowNode.data.daysLeft < 1) ? rowNode.data.casesToFulfill : (rowNode.data.casesToFulfill / rowNode.data.daysLeft); //required case/day
                 const rcdf = parseFloat(rcd.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
@@ -294,6 +294,8 @@ const AppReact = () => {
             { id: 4, distributionDeficit: 0, priority: 0, contractDays: 30, contractMin: 100, daysLeft: 29, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 },
             { id: 5, distributionDeficit: 0, priority: 0, contractDays: 45, contractMin: 150, daysLeft: 44, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 },
             { id: 6, distributionDeficit: 0, priority: 0, contractDays: 70, contractMin: 250, daysLeft: 69, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 },
+            { id: 7, distributionDeficit: 0, priority: 0, contractDays: 10, contractMin: 10, daysLeft: 10, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 },
+            { id: 8, distributionDeficit: 0, priority: 0, contractDays: 10, contractMin: 50, daysLeft: 9, convertedCases: 0, doNotQualify: 0, casesToFulfill: 1, assignedIntakes: 0, callables: 0, conversionRate: 25, requiredCasesPerDay: 0, actualCasesPerDay: 0, convShortfall: 0, intakeReq: 0, intakeDistribution: 0 },
             // Add more contracts as needed
         ]);
 
